@@ -32,10 +32,6 @@ class GUI:
         self.current_player = BLACK
 
     def run_game(self):
-        self.draw_start_button()
-        pygame.display.flip()
-        while not self.start_button_clicked:
-            self.check_events()
         self.show_difficulty_selection()
         while True:
             self.check_events()
@@ -46,60 +42,6 @@ class GUI:
                 self.declare_winner()
                 break
 
-    def draw_start_button(self):
-        self.screen.fill((173, 216, 230))
-        self.button("Start", self.board_width // 2, self.board_height // 2)
-
-    def button(self, text, x, y):
-        text_surface = self.font.render(text, True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=(x, y))
-        pygame.draw.rect(self.screen, (255, 255, 255), (text_rect.left - 20, text_rect.top - 20, text_rect.width + 40,
-                                                        text_rect.height + 40))
-        self.screen.blit(text_surface, text_rect)
-
-    def check_events(self):
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                if self.board_width // 2 - self.square_size // 2 <= mouse_pos[
-                    0] <= self.board_width // 2 + self.square_size // 2:
-                    if self.board_height // 2 - self.square_size // 2 <= mouse_pos[
-                        1] <= self.board_height // 2 + self.square_size // 2:
-                        self.start_button_clicked = True
-
-    def show_difficulty_selection(self):
-        difficulty_selected = False
-        while not difficulty_selected:
-            self.screen.fill((173, 216, 230))
-            self.button("Select Difficulty", self.board_width // 2, self.board_height // 2 - 50)
-            self.button("1. Easy", self.board_width // 2, self.board_height // 2)
-            self.button("2. Medium", self.board_width // 2, self.board_height // 2 + 50)
-            self.button("3. Hard", self.board_width // 2, self.board_height // 2 + 100)
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                elif event.type == MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    if self.board_width // 2 - self.square_size // 2 <= mouse_pos[
-                        0] <= self.board_width // 2 + self.square_size // 2:
-                        if self.board_height // 2 - 50 - self.square_size // 2 <= mouse_pos[
-                            1] <= self.board_height // 2 - 50 + self.square_size // 2:
-                            self.difficulty = 'easy'
-                            difficulty_selected = True
-                        elif self.board_height // 2 - self.square_size // 2 <= mouse_pos[
-                            1] <= self.board_height // 2 + self.square_size // 2:
-                            self.difficulty = 'medium'
-                            difficulty_selected = True
-                        elif self.board_height // 2 + 50 - self.square_size // 2 <= mouse_pos[
-                            1] <= self.board_height // 2 + 50 + self.square_size // 2:
-                            self.difficulty = 'hard'
-                            difficulty_selected = True
     def declare_winner(self):
         black_count = sum(row.count(BLACK) for row in self.board.board)
         white_count = sum(row.count(WHITE) for row in self.board.board)
@@ -109,7 +51,41 @@ class GUI:
             print("White wins!")
         else:
             print("It's a draw!")
+    def show_difficulty_selection(self):
+        difficulty_selected = False
+        while not difficulty_selected:
+            # light blue background
+            self.screen.fill((173, 216, 230))
+            self.button("Select Difficulty", -50)
+            self.button("1. Easy", 0)
+            self.button("2. Medium", 50)
+            self.button("3. Hard", 100)
+            pygame.display.flip()
 
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if self.board_width // 2 - 50 <= mouse_pos[0] <= self.board_width // 2 + 50:
+                        if self.board_height // 2 <= mouse_pos[1] <= self.board_height // 2 + 30:
+                            self.start_button_clicked = True
+                            self.difficulty = 'easy'
+                            difficulty_selected = True
+                        elif self.board_height // 2 + 50 <= mouse_pos[1] <= self.board_height // 2 + 80:
+                            self.start_button_clicked = True
+                            self.difficulty = 'medium'
+                            difficulty_selected = True
+                        elif self.board_height // 2 + 100 <= mouse_pos[1] <= self.board_height // 2 + 130:
+                            self.start_button_clicked = True
+                            self.difficulty = 'hard'
+                            difficulty_selected = True
+
+    def button(self, text, y_offset):
+        text_surface = self.font.render(text, True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=(self.board_width // 2, self.board_height // 2 + y_offset))
+        self.screen.blit(text_surface, text_rect)
     def draw_board(self):
         self.screen.fill((0, 144, 103))  # Green background
         self.draw_grid()
@@ -124,6 +100,25 @@ class GUI:
                 x, y = move[1] * self.square_size + self.square_size // 2, move[
                     0] * self.square_size + self.square_size // 2
                 pygame.draw.circle(self.screen, (0, 255, 0), (x, y), self.square_size // 6)
+
+    def check_events(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == MOUSEBUTTONDOWN:
+                if self.current_player == BLACK:  # User's turn only
+                    mouse_pos = pygame.mouse.get_pos()
+                    row = mouse_pos[1] // self.square_size
+                    col = mouse_pos[0] // self.square_size
+                    if 0 <= row < self.board_size and 0 <= col < self.board_size:
+                        if self.board.is_valid_move(row, col, self.current_player):
+                            self.board.make_move(row, col, self.current_player)
+                            self.current_player = WHITE  # Switch to computer's turn
+
+    def draw_start_button(self):
+        self.screen.fill((173, 216, 230))
+        self.button("Start", 0)
 
     def draw_grid(self):
         for row in range(self.board_size):
