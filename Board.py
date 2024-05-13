@@ -94,7 +94,8 @@ class Board:
         # Check if the game is over (no valid moves for both players)
         black_moves = any(self.is_valid_move(row, col, BLACK) for row in range(8) for col in range(8))
         white_moves = any(self.is_valid_move(row, col, WHITE) for row in range(8) for col in range(8))
-        return not black_moves and not white_moves
+        black_count, white_count = self.count_pieces()
+        return not black_moves and not white_moves or black_count == 0 or white_count == 0
 
     def count_pieces(self):
         # Count the number of black and white pieces on the board
@@ -108,11 +109,35 @@ class Board:
         new_board.board = [row[:] for row in self.board]
         return new_board
 
-    def get_board(self):
+    def is_board_full(self):
+        for row in self.board:
+            if EMPTY in row:
+                return False
+        return True
+
+    def get_winner(self):
+        black_count, white_count = self.count_pieces()
+        if black_count > white_count:
+            return BLACK
+        elif white_count > black_count:
+            return WHITE
+        else:
+            return None  # It's a tie
+
+    def reset_board(self):
+        self.board = self.initialize_board()
+
+    def get_board_state(self):
         return self.board
 
-    def set_board(self, board):
+    def set_board_state(self, board):
         self.board = board
+
+    def get_possible_moves(self, player_color):
+        return self.get_valid_moves(player_color)
+
+    def execute_move(self, row, col, player_color):
+        return self.make_move(row, col, player_color)
 
     def get_board_size(self):
         return len(self.board)
