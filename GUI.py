@@ -105,14 +105,32 @@ class GUI:
         text_rect = text_surface.get_rect()
         text_rect.center = (self.board_width // 2 + x_offset, self.board_height // 2 + y_offset)
         mouse_pos = pygame.mouse.get_pos()
-        if text_rect.collidepoint(mouse_pos):
-            if text == "Start":  # Check if the button text is "Start"
-                pygame.draw.rect(self.screen, (0, 255, 0), text_rect)  # Change the color to green when hovered over
+
+        # Define colors for highlighting and normal state
+        normal_color = (173, 216, 230)
+        hover_color = (0, 255, 0)  # Green color for highlighting
+
+        # Check if the button text is "Start" or part of color/difficulty selection
+        if text == "Start":
+            target_rect = pygame.Rect(text_rect)  # Create a rect to draw the button
+            if target_rect.collidepoint(mouse_pos):
+                pygame.draw.rect(self.screen, hover_color, target_rect)  # Highlight when hovered
             else:
-                pygame.draw.rect(self.screen, (255, 255, 255), text_rect)  # Keep the color as white for other buttons
-        self.screen.blit(text_surface, text_rect)
+                pygame.draw.rect(self.screen, normal_color, target_rect)  # Normal state
 
+            self.screen.blit(text_surface, text_rect)
+        else:
+            # Draw colored square around selected color/difficulty
+            if text == "1. Black" and self.current_player == BLACK :
+                pygame.draw.rect(self.screen, (255, 0, 0), text_rect, 2)  # Red border for selected color
+            elif text == "2. White" and self.current_player == WHITE :
+                pygame.draw.rect(self.screen, (255, 0, 0), text_rect, 2)  # Red border for selected color
+            elif text in ["1. Easy", "2. Medium", "3. Hard"] and self.difficulty == text.split(". ")[1].lower() :
+                pygame.draw.rect(self.screen, (255, 0, 0), text_rect, 2)  # Red border for selected difficulty
+            else:
+                pygame.draw.rect(self.screen, normal_color, text_rect)  # Normal state for other options
 
+            self.screen.blit(text_surface, text_rect)
 
     def showScore(self):
         black_count = sum(row.count(BLACK) for row in self.board.board)
