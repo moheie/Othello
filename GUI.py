@@ -3,6 +3,7 @@ import sys
 from pygame.locals import *
 import random
 
+from AIplayer import AIPlayer
 from Board import Board
 from GameController import GameController
 
@@ -219,18 +220,15 @@ class GUI:
                 pygame.draw.rect(self.screen, (19, 26, 24), (x, y, self.square_size, self.square_size), 2)
 
     def make_computer_move(self):
-        if self.difficulty == 'easy':
-            # Simple random move for easy difficulty
-            valid_moves = self.board.get_valid_moves(WHITE)
-            if valid_moves:
-                row, col = random.choice(valid_moves)
-                self.board.make_move(row, col, WHITE)
-                self.current_player = BLACK  # Switch back to user's turn
-        elif self.difficulty == 'medium':
-            # Implement medium difficulty logic here
+        if self.current_player == WHITE:  # Computer's turn only
+            if self.difficulty == 'easy':
+                depth = 1
+            elif self.difficulty == 'medium':
+                depth = 3
+            elif self.difficulty == 'hard':
+                depth = 5
 
-            pass
-        elif self.difficulty == 'hard':
-            # Implement hard difficulty logic here
-            pass
+            ai_player = AIPlayer(WHITE, depth)
+            ai_player.make_move(self.board)
+            self.current_player = BLACK  # Switch back to user's turn
 
