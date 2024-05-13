@@ -6,10 +6,11 @@ WHITE = 'W'
 EMPTY = ' '
 
 class GameController:
-    def __init__(self, difficulty):
+    def __init__(self, player1, player2):
         self.board = Board()
-        self.black_player = Player(BLACK)
-        self.white_player = Player(WHITE)
-        self.current_player = self.black_player if difficulty == 'easy' else self.white_player
+        self.player1 = player1
+        self.player2 = player2
+        self.current_player = player1
+
 
 

@@ -6,17 +6,18 @@ import random
 from AIplayer import AIPlayer
 from Board import Board
 from GameController import GameController
+from Player import Player
 
 BLACK = 'B'
 WHITE = 'W'
 EMPTY = ' '
 
 class GUI:
-    def __init__(self, difficulty='easy'):
+    def __init__(self):
         self.SCREEN_SIZE = (640, 750)
         self.board_size = 8
         self.square_size = 80
-        self.game_controller = GameController(difficulty)
+        self.game_controller = GameController(Player(BLACK), AIPlayer(WHITE, 3))
         self.board_width = self.board_size * self.square_size
         self.board_height = self.board_size * self.square_size
         self.screen = pygame.display.set_mode(self.SCREEN_SIZE)
