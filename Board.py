@@ -20,10 +20,16 @@ class Board:
         board[mid - 1][mid] = BLACK
         board[mid][mid - 1] = BLACK
         return board
+
     def display_board(self):
-        # Display the current game board state
-        for row in self.board:
-            print(row)
+        # Display the game board
+        print("  0 1 2 3 4 5 6 7")
+        for i, row in enumerate(self.board):
+            print(i, end=' ')
+            for col in row:
+                print(col, end=' ')
+            print()
+
     def get_valid_moves(self, player_color):
         # Get a list of valid moves for the given player color
         valid_moves = []
@@ -49,17 +55,20 @@ class Board:
                     if self.board[r][c] == EMPTY:
                         break
                     if self.board[r][c] == player_color:
-                        return True  # Move is valid
+                        return True
                     r += dr
                     c += dc
 
-        return False  # No valid move found in any direction
+        return False
 
     def make_move(self, row, col, player_color):
-        # Make a move on the board
-        if self.is_valid_move(row, col, player_color):
-            self.board[row][col] = player_color
-            self.flip_pieces(row, col, player_color)
+        # Make a move on the board for the given player color
+        if not self.is_valid_move(row, col, player_color):
+            return False
+
+        self.board[row][col] = player_color
+        self.flip_pieces(row, col, player_color)
+        return True
 
     def flip_pieces(self, row, col, player_color):
         # Implement logic to flip opponent's pieces when a move is made
@@ -86,3 +95,28 @@ class Board:
         black_moves = any(self.is_valid_move(row, col, BLACK) for row in range(8) for col in range(8))
         white_moves = any(self.is_valid_move(row, col, WHITE) for row in range(8) for col in range(8))
         return not black_moves and not white_moves
+
+    def count_pieces(self):
+        # Count the number of black and white pieces on the board
+        black_count = sum(row.count(BLACK) for row in self.board)
+        white_count = sum(row.count(WHITE) for row in self.board)
+        return black_count, white_count
+
+    def copy(self):
+        # Create a copy of the board
+        new_board = Board()
+        new_board.board = [row[:] for row in self.board]
+        return new_board
+
+    def get_board(self):
+        return self.board
+
+    def set_board(self, board):
+        self.board = board
+
+    def get_board_size(self):
+        return len(self.board)
+
+    def get_score(self):
+        black_count, white_count = self.count_pieces()
+        return black_count, white_count
