@@ -4,6 +4,9 @@ WHITE = 'W'
 EMPTY = ' '
 
 class AIPlayer(Player):
+
+    def __str__(self):
+        return self.color
     def __init__(self, color, difficulty):
         super().__init__(color)
         self.difficulty = difficulty

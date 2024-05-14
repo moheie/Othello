@@ -46,9 +46,14 @@ class GUI:
             self.draw_board()
             pygame.display.flip()
             self.clock.tick(30)
-            if self.board.is_game_over() or not self.board.get_valid_moves(self.game_controller.human_player.color) and not self.board.get_valid_moves(self.game_controller.ai_player.color):
+            if self.board.is_game_over() or not self.board.get_valid_moves(
+                    self.game_controller.human_player.color) and not self.board.get_valid_moves(
+                    self.game_controller.ai_player.color):
                 self.declare_winner()
                 break
+            elif not self.board.get_valid_moves(self.current_player):
+                # If the current player has no valid moves, switch to the other player
+                self.current_player = self.game_controller.human_player.color if self.current_player == self.game_controller.ai_player.color else self.game_controller.ai_player.color
 
     def animate_flip(self, row, col, color):
         for i in range(1, 11):
