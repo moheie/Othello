@@ -79,7 +79,7 @@ class GUI:
         text_rect = text_surface.get_rect(center=(self.board_width // 2, self.board_height // 2))
         self.screen.blit(text_surface, text_rect)
         pygame.display.flip()
-        pygame.time.wait(3000)
+        pygame.time.wait(6000)
         self.reset_game()
         self.run_game()
 

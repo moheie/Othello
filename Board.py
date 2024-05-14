@@ -12,13 +12,9 @@ class Board:
         self.board = self.initialize_board()
 
     def initialize_board(self):
-        # Initialize the game board with starting positions
         board = [[EMPTY for _ in range(8)] for _ in range(8)]
-        mid = len(board) // 2
-        board[mid - 1][mid - 1] = WHITE
-        board[mid][mid] = WHITE
-        board[mid - 1][mid] = BLACK
-        board[mid][mid - 1] = BLACK
+        board[3][3] = board[4][4] = WHITE
+        board[3][4] = board[4][3] = BLACK
         return board
 
     def display_board(self):
@@ -41,7 +37,7 @@ class Board:
 
     def is_valid_move(self, row, col, player_color):
         # Check if a move is valid for the given player color
-        if self.board[row][col] != EMPTY:
+        if self.board[row][col] != EMPTY or not (0 <= row < 8 and 0 <= col < 8):
             return False  # Square is not empty
 
         # Directions to check for opponent's pieces
