@@ -22,7 +22,7 @@ class GUI:
         self.screen = pygame.display.set_mode(self.SCREEN_SIZE)
         self.clock = pygame.time.Clock()
         self.board = Board()
-        self.current_player = None  # Initialize player color choice
+        self.current_player = None # Initialize player color choice
         self.difficulty = None  # Initialize difficulty choice
         self.init_pygame()
         self.background_image = pygame.image.load('desktop-wallpaper-engaging-blank-blank-blue-gaming.jpg')
@@ -65,14 +65,19 @@ class GUI:
             pygame.time.wait(50)
 
     def declare_winner(self):
+        # print on the screen
         black_count = sum(row.count(BLACK) for row in self.board.board)
         white_count = sum(row.count(WHITE) for row in self.board.board)
         if black_count > white_count:
-            print("Black wins!")
+            text = "Black Wins!"
         elif white_count > black_count:
-            print("White wins!")
+            text = "White Wins!"
         else:
-            print("It's a draw!")
+            text = "It's a tie!"
+        text_surface = self.font.render(text, True, (0, 0, 0))
+        text_rect = text_surface.get_rect(center=(self.board_width // 2, self.board_height // 2))
+        self.screen.blit(text_surface, text_rect)
+        pygame.display.flip()
 
     def show_menu(self):
         color_selected = False
@@ -84,13 +89,13 @@ class GUI:
             self.screen.blit(self.background_image, (0, 0))
             self.button(0, -200, "Othello")
             self.button(0, -150, "Select color")
-            self.button(-100, -100, "1. Black")
-            self.button(100, -100, "2. White")
-            self.button(0, -50, "Select Difficulty")
-            self.button(0, 0, "1. Easy")
-            self.button(0, 50, "2. Medium")
-            self.button(0, 100, "3. Hard")
-            self.button(0, 150, "Start")  # Add a Start button
+            self.button(0, -100, "1. Black")
+            self.button(0, -50, "2. White")
+            self.button(0, 0, "Select Difficulty")
+            self.button(0, 50, "1. Easy")
+            self.button(0, 100, "2. Medium")
+            self.button(0, 150, "3. Hard")
+            self.button(0, 250, "Start")  # Add a Start button
             pygame.display.flip()
 
             for event in pygame.event.get():
@@ -100,26 +105,26 @@ class GUI:
                 elif event.type == MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
 
-                    if self.board_height // 2 <= mouse_pos[1] <= self.board_height // 2 + 30:
+                    if self.board_height // 2 - 100 <= mouse_pos[1] <= self.board_height // 2 - 70:
                         self.current_player = BLACK
                         color_selected = True
-                    elif self.board_height // 2 + 50 <= mouse_pos[1] <= self.board_height // 2 + 80:
+                    elif self.board_height // 2 - 50 <= mouse_pos[1] <= self.board_height // 2 - 20:
                         self.current_player = WHITE
                         color_selected = True
 
-                    if self.board_height // 2 + 150 <= mouse_pos[1] <= self.board_height // 2 + 180 and \
-                            color_selected and difficulty_selected:  # Only start the game if color and difficulty are selected
-                        start_button_clicked = True
-
-                    if self.board_height // 2 <= mouse_pos[1] <= self.board_height // 2 + 30:
+                    if self.board_height // 2 <= mouse_pos[1] <= self.board_height // 2 + 50:
                         self.difficulty = 'easy'
                         difficulty_selected = True
-                    elif self.board_height // 2 + 50 <= mouse_pos[1] <= self.board_height // 2 + 80:
+                    elif self.board_height // 2 + 70 <= mouse_pos[1] <= self.board_height // 2 + 120:
                         self.difficulty = 'medium'
                         difficulty_selected = True
-                    elif self.board_height // 2 + 100 <= mouse_pos[1] <= self.board_height // 2 + 130:
+                    elif self.board_height // 2 + 140 <= mouse_pos[1] <= self.board_height // 2 + 190:
                         self.difficulty = 'hard'
                         difficulty_selected = True
+
+                    if self.board_height // 2 + 210 <= mouse_pos[1] <= self.board_height // 2 + 260 and \
+                            color_selected and difficulty_selected:  # Only start the game if color and difficulty are selected
+                            start_button_clicked = True
 
     def button(self, x_offset, y_offset, text):
         font = pygame.font.Font("foxonthego.ttf", 36)
@@ -230,6 +235,26 @@ class GUI:
                             self.board.make_move(row, col, player_color)
                             self.current_player = WHITE if player_color == BLACK else BLACK  # Switch player's turn
 
+                def check_events(self):
+                    for event in pygame.event.get():
+                        if event.type == QUIT:
+                            pygame.quit()
+                            sys.exit()
+                        elif event.type == MOUSEBUTTONDOWN:
+                            mouse_pos = pygame.mouse.get_pos()
+                            if self.start_button_clicked:  # Check if the game has started
+                                row = mouse_pos[1] // self.square_size
+                                col = mouse_pos[0] // self.square_size
+
+                                if self.current_player == BLACK or self.current_player == WHITE:  # Player's turn only
+                                    player_color = self.current_player
+                                    if 0 <= row < self.board_size and 0 <= col < self.board_size:
+                                        if self.board.is_valid_move(row, col, player_color):
+                                            self.animate_flip(row, col, player_color)
+                                            self.board.make_move(row, col, player_color)
+                                            self.current_player = WHITE if player_color == BLACK else BLACK  # Switch player's turn
+                            else:
+                                self.show_menu()  # If the game has not started, show the menu
                 # Uncomment this block if you want to manually trigger the computer's move
                 # if self.current_player == WHITE:  # Computer's turn
                 #     self.make_computer_move()
