@@ -212,16 +212,15 @@ class GUI:
         self.draw_valid_moves()
         self.showScore()
         self.show_timer()
-        if self.current_player == WHITE:  # Computer's turn
+        if self.current_player == self.game_controller.ai_player.color:  # Computer's turn
             self.make_computer_move()
 
-        # Draw valid move indicators for the current player (BLACK)
-        if self.current_player == BLACK:
-            valid_moves = self.board.get_valid_moves(BLACK)
-            for move in valid_moves:
-                x, y = move[1] * self.square_size + self.square_size // 2, move[
-                    0] * self.square_size + self.square_size // 2
-                pygame.draw.circle(self.screen, (0, 255, 0), (x, y), self.square_size // 6)
+        # Draw valid move indicators for the current player
+        valid_moves = self.board.get_valid_moves(self.game_controller.human_player.color)
+        for move in valid_moves:
+            x, y = move[1] * self.square_size + self.square_size // 2, move[
+                0] * self.square_size + self.square_size // 2
+            pygame.draw.circle(self.screen, (0, 255, 0), (x, y), self.square_size // 6)
 
     def check_events(self):
         for event in pygame.event.get():
@@ -230,17 +229,17 @@ class GUI:
                 sys.exit()
             elif event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.current_player == BLACK:
+                if self.current_player == self.game_controller.human_player.color:
                     row = mouse_pos[1] // self.square_size
                     col = mouse_pos[0] // self.square_size
                     if 0 <= row < self.board_size and 0 <= col < self.board_size:
                         if self.board.is_valid_move(row, col, self.current_player):
                             self.animate_flip(row, col, self.current_player)
                             self.board.make_move(row, col, self.current_player)
-                            self.current_player = WHITE if self.current_player == BLACK else BLACK
+                            self.current_player = self.game_controller.ai_player.color
 
     def make_computer_move(self):
-        if self.current_player == WHITE:
+        if self.current_player == self.game_controller.ai_player.color:
             if self.difficulty == 'easy':
                 depth = 1
             elif self.difficulty == 'medium':
@@ -248,7 +247,7 @@ class GUI:
             elif self.difficulty == 'hard':
                 depth = 5
 
-            ai_player = AIPlayer(WHITE, depth)
+            ai_player = AIPlayer(self.game_controller.ai_player.color, depth)
             ai_player.make_move(self.board)
-            self.current_player = BLACK
+            self.current_player = self.game_controller.human_player.color
 
