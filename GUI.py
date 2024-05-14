@@ -1,5 +1,7 @@
 import pygame
 import sys
+
+import pygame_gui
 from pygame.locals import *
 from AI import AIPlayer
 from Board import Board
@@ -44,7 +46,7 @@ class GUI:
             self.draw_board()
             pygame.display.flip()
             self.clock.tick(30)
-            if self.board.is_game_over():
+            if self.board.is_game_over() or not self.board.get_valid_moves(self.game_controller.human_player.color) and not self.board.get_valid_moves(self.game_controller.ai_player.color):
                 self.declare_winner()
                 break
 
@@ -72,6 +74,15 @@ class GUI:
         text_rect = text_surface.get_rect(center=(self.board_width // 2, self.board_height // 2))
         self.screen.blit(text_surface, text_rect)
         pygame.display.flip()
+        pygame.time.wait(3000)
+        self.reset_game()
+        self.run_game()
+
+    def reset_game(self):
+        self.board.reset_board()  # Reset the board
+        self.current_player = None  # Reset player color choice
+        self.difficulty = None  # Reset difficulty choice
+        self.game_controller = None  # Reset the game controller
 
     def show_menu(self):
         color_selected = False
