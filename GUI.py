@@ -46,6 +46,8 @@ class GUI:
                                                        self.difficulty))
         while True:
             self.check_events()
+            if self.game_controller.is_computer_turn():
+                self.make_computer_move()
             self.draw_board()
             pygame.display.flip()
             self.clock.tick(30)
@@ -179,22 +181,6 @@ class GUI:
             x, y = move[1] * self.square_size + self.square_size // 2, move[0] * self.square_size + self.square_size // 2
             pygame.draw.circle(self.screen, (0, 255, 0), (x, y), self.square_size // 6)
 
-    def draw_board(self):
-        self.screen.fill((173, 216, 230))
-        self.screen.blit(self.background_image, (0, 0))
-        self.draw_grid()
-        self.draw_pieces()
-        self.draw_current_player_indicator()
-        self.draw_valid_moves()
-        self.showScore()
-        self.show_timer()  # Show the timer
-
-        # Check if it's the computer's turn based on the player's color choice
-        if self.current_player == WHITE and self.current_player != BLACK:
-            self.make_computer_move()
-
-
-
     def show_timer(self):
         elapsed_time = (pygame.time.get_ticks() - self.start_time) // 1000  # Convert to seconds
         minutes = elapsed_time // 60
@@ -217,6 +203,20 @@ class GUI:
                     col * self.square_size + self.square_size // 2, row * self.square_size + self.square_size // 2),
                                        self.square_size // 3)
 
+    def draw_board(self):
+        self.screen.fill((173, 216, 230))
+        self.screen.blit(self.background_image, (0, 0))
+        self.draw_grid()
+        self.draw_pieces()
+        self.draw_current_player_indicator()
+        self.draw_valid_moves()
+        self.showScore()
+        self.show_timer()  # Show the timer
+
+        # Check if it's the computer's turn based on the player's color choice
+        if self.current_player == WHITE and self.current_player != BLACK:
+            self.make_computer_move()
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -235,29 +235,7 @@ class GUI:
                             self.board.make_move(row, col, player_color)
                             self.current_player = WHITE if player_color == BLACK else BLACK  # Switch player's turn
 
-                def check_events(self):
-                    for event in pygame.event.get():
-                        if event.type == QUIT:
-                            pygame.quit()
-                            sys.exit()
-                        elif event.type == MOUSEBUTTONDOWN:
-                            mouse_pos = pygame.mouse.get_pos()
-                            if self.start_button_clicked:  # Check if the game has started
-                                row = mouse_pos[1] // self.square_size
-                                col = mouse_pos[0] // self.square_size
 
-                                if self.current_player == BLACK or self.current_player == WHITE:  # Player's turn only
-                                    player_color = self.current_player
-                                    if 0 <= row < self.board_size and 0 <= col < self.board_size:
-                                        if self.board.is_valid_move(row, col, player_color):
-                                            self.animate_flip(row, col, player_color)
-                                            self.board.make_move(row, col, player_color)
-                                            self.current_player = WHITE if player_color == BLACK else BLACK  # Switch player's turn
-                            else:
-                                self.show_menu()  # If the game has not started, show the menu
-                # Uncomment this block if you want to manually trigger the computer's move
-                # if self.current_player == WHITE:  # Computer's turn
-                #     self.make_computer_move()
 
     def draw_grid(self):
         for row in range(self.board_size):
@@ -280,5 +258,4 @@ class GUI:
             ai_player = AIPlayer(computer_color, depth)  # Use computer's color for AIPlayer
             ai_player.make_move(self.board)
             self.current_player = BLACK if computer_color == WHITE else WHITE  # Switch back to user's turn
-
 

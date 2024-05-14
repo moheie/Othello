@@ -6,11 +6,19 @@ WHITE = 'W'
 EMPTY = ' '
 
 class GameController:
-    def __init__(self, player1, player2):
-        self.board = Board()
-        self.player1 = player1
-        self.player2 = player2
-        self.current_player = player1
+    def __init__(self, human_player, ai_player):
+        self.human_player = human_player
+        self.ai_player = ai_player
+        self.current_player = human_player
+        self.board = Board()  # Assuming you have a Board class to manage the game state
 
+    def is_computer_turn(self):
+        return self.current_player == self.ai_player
+
+    def switch_turn(self):
+        if self.current_player == self.human_player:
+            self.current_player = self.ai_player
+        else:
+            self.current_player = self.human_player
 
 
